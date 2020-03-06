@@ -18,13 +18,14 @@ public class Main {
     public static void main(String[] args) throws Exception {
         int nserv = 100; // Number of servers
         int nrep = 10; // Number of repetitons of files
-        Servers serv = new Servers(nserv, nrep, 14564345);
-
         int nUsers = 100;
         int requestsPerUser = 10;
-        Requests req = new Requests(nUsers, requestsPerUser, 2355765);
+        int seed = 12345678;
 
-        Prac1State initialState = new Prac1State(req, serv);
+        Servers servers = new Servers(nserv, nrep, seed);
+        Requests requests = new Requests(nUsers, requestsPerUser, seed);
+
+        Prac1State initialState = new Prac1State(requests, servers, nserv, seed);
 
         Problem problem = new Problem(initialState, new Prac1SuccessorFunction(), new Prac1GoalTest(),
                 new Prac1HeuristicFunction());
