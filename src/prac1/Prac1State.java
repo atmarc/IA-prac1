@@ -25,6 +25,7 @@ public class Prac1State {
 
     private int nserv;
 
+
     public Prac1State(Requests req, Servers serv, int nserv, int seed) {
         UserID = new ArrayList<>();
         FileID = new ArrayList<>();
@@ -49,11 +50,31 @@ public class Prac1State {
         this.servers = serv;
     }
 
-    public Prac1State (ArrayList<Integer> userID, ArrayList<Integer> fileID, ArrayList<Set<Integer>> fileLocations,
-                       int [] reqAssignations) {
-        UserID = userID;
-        FileID = fileID;
-        FileLocations = fileLocations;
-        this.reqAssignations = reqAssignations.clone();
+    public Prac1State (Prac1State estatAnterior) {
+        this.UserID = estatAnterior.getUserID();
+        this.FileID = estatAnterior.getFileID();
+        this.FileLocations = estatAnterior.getFileLocations();
+        this.nserv = estatAnterior.getNserv();
+        this.reqAssignations = estatAnterior.getReqAssignations().clone();
+    }
+
+    public ArrayList<Integer> getUserID() {
+        return UserID;
+    }
+
+    public ArrayList<Integer> getFileID() {
+        return FileID;
+    }
+
+    public ArrayList<Set<Integer>> getFileLocations() {
+        return FileLocations;
+    }
+
+    public int[] getReqAssignations() {
+        return reqAssignations;
+    }
+
+    public int getNserv() {
+        return nserv;
     }
 }

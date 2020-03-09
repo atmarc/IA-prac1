@@ -7,6 +7,10 @@ import java.util.List;
 public class Prac1SuccessorFunction implements SuccessorFunction {
 
     public List getSuccessors(Object o) {
+        // Operadors:
+        //  - Canviar servidor assignat a una req
+        //  -
+
 
         return null;
     }
