@@ -38,6 +38,14 @@ public class Main {
 
         printActions(searchAgent.getActions());
         printInstrumentation(searchAgent.getInstrumentation());
+
+        Prac1State goal = (Prac1State) search.getGoalState();
+        String s = "";
+        int [] goalAssig = goal.getReqAssignations();
+        for (int i = 0; i < goalAssig.length; ++i) {
+            s += goalAssig[i] + " ";
+        }
+        System.out.println(s);
     }
 
     private static void printActions(List actions) {

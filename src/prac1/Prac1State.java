@@ -25,6 +25,7 @@ public class Prac1State {
 
     private int nserv;
 
+
     public Prac1State(Requests req, Servers serv, int nserv, int seed) {
         UserID = new ArrayList<>();
         FileID = new ArrayList<>();
@@ -37,7 +38,6 @@ public class Prac1State {
             FileLocations.add(aux);
         }
 
-        Random rand = new Random(seed);
         for (int i = 0; i < req.size(); ++i) {
             int [] aux = req.getRequest(i);
             int user = aux[0];
@@ -53,12 +53,52 @@ public class Prac1State {
         this.servers = serv;
     }
 
-    public Prac1State (ArrayList<Integer> userID, ArrayList<Integer> fileID, ArrayList<Set<Integer>> fileLocations,
-                       int [] reqAssignations) {
-        UserID = userID;
-        FileID = fileID;
-        FileLocations = fileLocations;
-        this.reqAssignations = reqAssignations.clone();
+    public Prac1State (Prac1State estatAnterior) {
+        this.UserID = estatAnterior.getUserID();
+        this.FileID = estatAnterior.getFileID();
+        this.FileLocations = estatAnterior.getFileLocations();
+        this.nserv = estatAnterior.getNserv();
+        this.reqAssignations = estatAnterior.getReqAssignations().clone();
+        this.servers = estatAnterior.getServers();
     }
 
+    public void changeAssignation (int i) {
+        int file = FileID.get(i);
+        Iterator<Integer> it = FileLocations.get(file).iterator();
+        Set <Integer> servers = FileLocations.get(file);
+        Random rand = new Random();
+
+        for (int x = 0; x < rand.nextInt(servers.size()); ++x)
+            it.next();
+
+        reqAssignations[i] = it.next();
+    }
+
+    public ArrayList<Integer> getUserID() {
+        return UserID;
+    }
+
+    public ArrayList<Integer> getFileID() {
+        return FileID;
+    }
+
+    public ArrayList<Set<Integer>> getFileLocations() {
+        return FileLocations;
+    }
+
+    public int[] getReqAssignations() {
+        return reqAssignations;
+    }
+
+    public int getNserv() {
+        return nserv;
+    }
+
+    public int getNreq() {
+        return reqAssignations.length;
+    }
+
+    public Servers getServers() {
+        return this.servers;
+    }
 }
