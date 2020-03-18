@@ -32,17 +32,21 @@ public class Prac1State {
         reqAssignations = new int [req.size()];
         this.nserv = nserv;
 
-        Random rand = new Random(seed);
-        for (int i = 0; i < req.size(); ++i) {
-            int [] aux = req.getRequest(i);
-            UserID.add(aux[0]);
-            FileID.add(aux[1]);
-            reqAssignations[i] = rand.nextInt(nserv);
-        }
-
         for (int i = 0; i < serv.size(); ++i) {
             Set<Integer> aux = serv.fileLocations(i);
             FileLocations.add(aux);
+        }
+
+        Random rand = new Random(seed);
+        for (int i = 0; i < req.size(); ++i) {
+            int [] aux = req.getRequest(i);
+            int user = aux[0];
+            int file = aux[1];
+
+            UserID.add(user);
+            FileID.add(file);
+
+            reqAssignations[i] = FileLocations.get(file).iterator().next();
         }
 
         this.requests = req;
@@ -56,4 +60,5 @@ public class Prac1State {
         FileLocations = fileLocations;
         this.reqAssignations = reqAssignations.clone();
     }
+
 }
