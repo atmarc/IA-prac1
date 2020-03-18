@@ -47,10 +47,11 @@ public class Prac1HeuristicFunction implements HeuristicFunction {
         final int MIN_TRANSMISSION_TIME = 100;
         final int MAX_TRANSMISSION_TIME = 5000;
         final int TIME_LAPSE = MAX_TRANSMISSION_TIME - MIN_TRANSMISSION_TIME;
+        final double maxH = 10;
 
-        double h1 = (maxTime - MIN_TRANSMISSION_TIME)/(TIME_LAPSE) * 10;
-        double h2 = coeficientVariacio * 10;
-        double h3 = (tempsTotal - MIN_TRANSMISSION_TIME * nReqs)/(TIME_LAPSE * nReqs) * 10;
+        double h1 = (maxTime - MIN_TRANSMISSION_TIME)/(TIME_LAPSE) * maxH;
+        double h2 = coeficientVariacio * maxH;
+        double h3 = (tempsTotal - MIN_TRANSMISSION_TIME * nReqs)/(TIME_LAPSE * nReqs) * maxH;
 
         double heuristicaSuprema = (h1 + h2 + h3) / 3;
 

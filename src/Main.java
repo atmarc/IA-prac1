@@ -46,6 +46,8 @@ public class Main {
             s += goalAssig[i] + " ";
         }
         System.out.println(s);
+        Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
+        System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
     }
 
     private static void printActions(List actions) {

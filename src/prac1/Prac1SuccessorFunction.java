@@ -19,7 +19,7 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
             Prac1State child = new Prac1State(father);
             child.changeAssignation(i);
 
-            successors.add(new Successor("Change Assignation " + i + hf.getHeuristicValue(child), child));
+            successors.add(new Successor("Change Assignation " + i + " " + hf.getHeuristicValue(child), child));
         }
 
         return successors;
