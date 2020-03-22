@@ -4,6 +4,7 @@ import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
+import aima.search.informed.SimulatedAnnealingSearch;
 import prac1.Prac1GoalTest;
 import prac1.Prac1HeuristicFunction;
 import prac1.Prac1State;
@@ -16,11 +17,11 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        int nserv = 100; // Number of servers
-        int nrep = 10; // Number of repetitons of files
-        int nUsers = 100;
-        int requestsPerUser = 10;
-        int seed = 12345678;
+        int nserv = 50; // Number of servers
+        int nrep = 5; // Number of repetitons of files
+        int nUsers = 200;
+        int requestsPerUser = 5;
+        int seed = 1234;
 
         Servers servers = new Servers(nserv, nrep, seed);
         Requests requests = new Requests(nUsers, requestsPerUser, seed);
@@ -32,6 +33,7 @@ public class Main {
                 new Prac1HeuristicFunction());
 
         Search search = new HillClimbingSearch();
+        //SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(2000, 100, 5, 0.001D);
 
         SearchAgent searchAgent = new SearchAgent(problem, search);
         System.out.println("Starting program!");
@@ -48,6 +50,8 @@ public class Main {
         System.out.println(s);
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
         System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
+        System.out.println("Max time: " + goal.getMaxTime() + " ms");
+        System.out.println("Total time: " + goal.getTotalTime() + " ms");
     }
 
     private static void printActions(List actions) {
