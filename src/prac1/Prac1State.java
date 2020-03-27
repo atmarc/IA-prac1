@@ -3,10 +3,8 @@ package prac1;
 import IA.DistFS.Requests;
 import IA.DistFS.Servers;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 public class Prac1State {
 
@@ -22,18 +20,18 @@ public class Prac1State {
 
     // Assignation
     private int [] reqAssignations; // la posició i conté el serverID que respon a la request i
-    private int [] serverTransmissionTimes;
     private int maxTransmissionTimeServer;
     private int nserv;
+    private HashMap<Integer, Integer>  serverTransmissionTimes;
 
 
 
     public Prac1State(Requests req, Servers serv, int nserv, int seed) {
-        UserID = new ArrayList<>();
-        FileID = new ArrayList<>();
-        FileLocations = new ArrayList<>();
-        reqAssignations = new int [req.size()];
-        serverTransmissionTimes =  new int [serv.size()];
+        this.UserID = new ArrayList<>();
+        this.FileID = new ArrayList<>();
+        this.FileLocations = new ArrayList<>();
+        this.reqAssignations = new int [req.size()];
+        this.serverTransmissionTimes = new HashMap<>();
         this.nserv = nserv;
         this.requests = req;
         this.servers = serv;
@@ -41,7 +39,6 @@ public class Prac1State {
         for (int i = 0; i < serv.size(); ++i) {
             Set<Integer> aux = serv.fileLocations(i);
             FileLocations.add(aux);
-            serverTransmissionTimes[i] = 0;
         }
 
         for (int i = 0; i < req.size(); ++i) {
@@ -52,9 +49,17 @@ public class Prac1State {
             UserID.add(user);
             FileID.add(file);
 
+
+
+            /*
             int current_server = FileLocations.get(file).iterator().next();
             reqAssignations[i] = current_server;
-            serverTransmissionTimes[i] += servers.tranmissionTime(current_server, user);
+            int time = servers.tranmissionTime(current_server, user);
+            addTime(current_server, time);
+            */
+
+            assignReqToMinTransmissionTime(i);
+
         }
         calcMaxTransmissionTimeServer();
 
@@ -63,33 +68,16 @@ public class Prac1State {
         System.out.println("First node heuristic: " + hf.getHeuristicValue(this));
     }
 
+    // Constructora de copia
     public Prac1State (Prac1State estatAnterior) {
         this.UserID = estatAnterior.getUserID();
         this.FileID = estatAnterior.getFileID();
         this.FileLocations = estatAnterior.getFileLocations();
         this.nserv = estatAnterior.getNserv();
         this.reqAssignations = estatAnterior.getReqAssignations().clone();
-        this.serverTransmissionTimes = estatAnterior.getTransmissionTimes().clone();
+        this.serverTransmissionTimes = estatAnterior.copyTransmissionTimes();
+        this.maxTransmissionTimeServer = estatAnterior.getMaxTransmissionTimeServer();
         this.servers = estatAnterior.getServers();
-    }
-
-    public void changeAssignation (int i) {
-        int file = FileID.get(i);
-        int previous_server = reqAssignations[i];
-        serverTransmissionTimes[previous_server] -= this.servers.tranmissionTime(previous_server, UserID.get(i));
-        Iterator<Integer> it = FileLocations.get(file).iterator();
-        Set <Integer> serversWithTheFile = FileLocations.get(file);
-        Random rand = new Random();
-
-        for (int x = 0; x < rand.nextInt(serversWithTheFile.size()); ++x)
-            it.next();
-
-        reqAssignations[i] = it.next();
-        int new_server = reqAssignations[i];
-        serverTransmissionTimes[new_server] += this.servers.tranmissionTime(new_server, UserID.get(i));
-
-        // Check max transmission time server
-        calcMaxTransmissionTimeServer();
     }
 
     public ArrayList<Integer> getUserID() {
@@ -102,6 +90,16 @@ public class Prac1State {
 
     public ArrayList<Set<Integer>> getFileLocations() {
         return FileLocations;
+    }
+
+    private HashMap <Integer,Integer> copyTransmissionTimes() {
+        HashMap <Integer, Integer> hashCopy = new HashMap<>();
+        for(Map.Entry<Integer, Integer> entry : serverTransmissionTimes.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            hashCopy.put(key, value);
+        }
+        return  hashCopy;
     }
 
     public int[] getReqAssignations() {
@@ -120,22 +118,25 @@ public class Prac1State {
         return this.servers;
     }
 
-    public int getServerTransmissionTime(int i) {
-        return serverTransmissionTimes[i];
-    }
-
-    public int[] getTransmissionTimes() {
-        return serverTransmissionTimes;
+    public int getServerTransmissionTime(int id) {
+        if (serverTransmissionTimes.containsKey(id)) {
+            return serverTransmissionTimes.get(id);
+        }
+        return 0;
     }
 
     private void calcMaxTransmissionTimeServer () {
-        int maxTransimssionTime = 0;
-        for (int i = 0; i < this.nserv; ++i) {
-            if (getServerTransmissionTime(i) > maxTransimssionTime) {
-                maxTransimssionTime = getServerTransmissionTime(i);
-                this.maxTransmissionTimeServer = i;
+        int maxValue = 0;
+        int maxServer = -1;
+        for(Map.Entry<Integer, Integer> entry : serverTransmissionTimes.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if (maxValue < value) {
+                maxValue = value;
+                maxServer = key;
             }
         }
+        this.maxTransmissionTimeServer = maxServer;
     }
 
     public int getMaxTransmissionTimeServer() {
@@ -143,14 +144,197 @@ public class Prac1State {
     }
 
     public int getMaxTime() {
-        return serverTransmissionTimes[maxTransmissionTimeServer];
+        int maxValue = 0;
+        for(Map.Entry<Integer, Integer> entry : serverTransmissionTimes.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if (maxValue < value) maxValue = value;
+        }
+        return maxValue;
     }
 
     public double getTotalTime() {
         double totalTime = 0;
-        for (int i = 0; i < serverTransmissionTimes.length; ++i) {
-            totalTime += serverTransmissionTimes[i];
+        for(Map.Entry<Integer, Integer> entry : serverTransmissionTimes.entrySet()) {
+            totalTime += entry.getValue();
         }
         return totalTime;
+    }
+
+    public void addTime(int serverID, int time) {
+        if (serverTransmissionTimes.containsKey(serverID)) {
+            serverTransmissionTimes.put(serverID, time + serverTransmissionTimes.get(serverID));
+        }
+        else {
+            serverTransmissionTimes.put(serverID, time);
+        }
+    }
+
+    // Initial state, every request goes to the closest server
+    private void assignReqToMinTransmissionTime(int i) {
+        int file = FileID.get(i);
+        Iterator <Integer> it = FileLocations.get(file).iterator();
+
+        int minServer = -1;
+        int minValue = Integer.MAX_VALUE;
+        for (int x = 0; x < FileLocations.get(file).size(); ++x) {
+            int currentServer = it.next();
+            int transTime = servers.tranmissionTime(currentServer, UserID.get(i));
+            if (transTime < minValue) {
+                minValue = transTime;
+                minServer = currentServer;
+            }
+        }
+        reqAssignations[i] = minServer;
+        addTime(minServer, servers.tranmissionTime(minServer, UserID.get(i)));
+    }
+
+    // Operador 1
+    public void changeAssignation (int i) {
+        int file = FileID.get(i);
+        int previous_server = reqAssignations[i];
+        int previousTime = this.servers.tranmissionTime(previous_server, UserID.get(i));
+        addTime(previous_server, -previousTime);
+        Iterator<Integer> it = FileLocations.get(file).iterator();
+        Set <Integer> serversWithTheFile = FileLocations.get(file);
+        Random rand = new Random();
+
+        for (int x = 0; x < rand.nextInt(serversWithTheFile.size()); ++x)
+            it.next();
+
+        reqAssignations[i] = it.next();
+        int newServer = reqAssignations[i];
+        int newTime = this.servers.tranmissionTime(newServer, UserID.get(i));
+        addTime(newServer, newTime);
+
+        // Check max transmission time server
+        calcMaxTransmissionTimeServer();
+    }
+
+    // Operador 2
+    public void changeReqToMin(int i) {
+        int oldServer = reqAssignations[i];
+        int file = FileID.get(i);
+        Iterator <Integer> it = FileLocations.get(file).iterator();
+
+        int minServer = -1;
+        int minValue = Integer.MAX_VALUE;
+        for (int x = 0; x < FileLocations.get(file).size(); ++x) {
+            int currentServer = it.next();
+            if (currentServer != oldServer) {
+                int transTime = getServerTransmissionTime(currentServer);
+                int addedTime = servers.tranmissionTime(currentServer, UserID.get(i));
+                if (transTime + addedTime < minValue) {
+                    minValue = transTime + addedTime;
+                    minServer = currentServer;
+                }
+            }
+        }
+
+        reqAssignations[i] = minServer;
+        addTime(oldServer, -servers.tranmissionTime(oldServer, UserID.get(i)));
+        addTime(minServer, servers.tranmissionTime(minServer, UserID.get(i)));
+    }
+
+    // Operador 3
+    public void swapAssignations(int i) {
+        int oldServer = reqAssignations[i];
+        int file = FileID.get(i);
+        Iterator <Integer> it = FileLocations.get(file).iterator();
+
+        for (int x = 0; x < FileLocations.get(file).size(); ++x) {
+            int currentServer = it.next();
+            if (currentServer != oldServer) {
+                boolean trobat = false;
+                int index = -1;
+                for (int j = 0; j < reqAssignations.length; ++j) {
+                    if (reqAssignations[j] == currentServer) {
+                        index = j;
+                        trobat = true;
+                        break;
+                    }
+                }
+                if (trobat) {
+                    reqAssignations[i] = currentServer;
+                    reqAssignations[index] = oldServer;
+                    addTime(currentServer, -servers.tranmissionTime(currentServer, UserID.get(index)));
+                    addTime(currentServer, servers.tranmissionTime(currentServer, UserID.get(i)));
+
+                    addTime(oldServer, -servers.tranmissionTime(oldServer, UserID.get(i)));
+                    addTime(oldServer, servers.tranmissionTime(oldServer, UserID.get(index)));
+
+                    break;
+                }
+            }
+        }
+
+
+    }
+
+    // Operador 4
+    public void moveAssignation(int i) {
+        int oldServer = reqAssignations[i];
+        int file = FileID.get(i);
+        Iterator <Integer> it = FileLocations.get(file).iterator();
+
+        for (int x = 0; x < FileLocations.get(file).size(); ++x) {
+            int currentServer = it.next();
+            if (currentServer == oldServer) {
+                break;
+            }
+        }
+        int nextServer;
+        if (it.hasNext()) {
+            nextServer = it.next();
+        }
+        else {
+            it = FileLocations.get(file).iterator();
+            nextServer = it.next();
+        }
+        reqAssignations[i] = nextServer;
+        addTime(oldServer, -servers.tranmissionTime(oldServer, UserID.get(i)));
+        addTime(nextServer, servers.tranmissionTime(nextServer, UserID.get(i)));
+    }
+
+    // Operador 5
+    public void changeMaxRandom() {
+        calcMaxTransmissionTimeServer();
+        int maxServer = this.maxTransmissionTimeServer;
+        ArrayList<Integer> reqMaxServer = new ArrayList<>();
+        int minTimeReq = -1;
+        int minTime = Integer.MAX_VALUE;
+
+        for (int i = 0; i < this.getNreq(); ++i) {
+            if (reqAssignations[i] == maxServer) {
+                reqMaxServer.add(i);
+                int currentTime = servers.tranmissionTime(maxServer, UserID.get(i));
+                if (currentTime < minTime) {
+                    minTime = currentTime;
+                    minTimeReq = i;
+                }
+            }
+        }
+
+        //changeReqToMin(maxTimeReq);
+        changeAssignation(minTimeReq);
+    }
+
+    public void swapRandom(int i) {
+        int file = FileID.get(i);
+        int previousServer = reqAssignations[i];
+        int previousTransmisionTime = this.servers.tranmissionTime(previousServer, UserID.get(i));
+        Iterator<Integer> it = FileLocations.get(file).iterator();
+        Set <Integer> serversWithTheFile = FileLocations.get(file);
+        Random rand = new Random();
+
+        for (int x = 0; x < rand.nextInt(serversWithTheFile.size()); ++x)
+            it.next();
+
+        int newServer = reqAssignations[i];
+        int newTransmisionTime = this.servers.tranmissionTime(newServer, UserID.get(i));
+
+        // Check max transmission time server
+        calcMaxTransmissionTimeServer();
+
     }
 }

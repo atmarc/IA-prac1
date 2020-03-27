@@ -10,6 +10,7 @@ import prac1.Prac1HeuristicFunction;
 import prac1.Prac1State;
 import prac1.Prac1SuccessorFunction;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -34,20 +35,19 @@ public class Main {
 
         Search search = new HillClimbingSearch();
         //SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(2000, 100, 5, 0.001D);
-
-        SearchAgent searchAgent = new SearchAgent(problem, search);
         System.out.println("Starting program!");
+
+        double before = System.currentTimeMillis();
+        SearchAgent searchAgent = new SearchAgent(problem, search);
+        double after = System.currentTimeMillis();
 
         printActions(searchAgent.getActions());
         printInstrumentation(searchAgent.getInstrumentation());
 
         Prac1State goal = (Prac1State) search.getGoalState();
-        String s = "";
-        int [] goalAssig = goal.getReqAssignations();
-        for (int i = 0; i < goalAssig.length; ++i) {
-            s += goalAssig[i] + " ";
-        }
-        System.out.println(s);
+
+        System.out.println("Execution time: " + (after - before) + " ms");
+
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
         System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
         System.out.println("Max time: " + goal.getMaxTime() + " ms");

@@ -6,6 +6,7 @@ import aima.search.framework.SuccessorFunction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Prac1SuccessorFunction implements SuccessorFunction {
 
@@ -14,10 +15,14 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
         ArrayList<Successor> successors = new ArrayList<>();
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
 
-        // Operador 1: Canviar servidor assignat a una req
         for (int i = 0; i < father.getNreq(); ++i) {
             Prac1State child = new Prac1State(father);
-            child.changeAssignation(i);
+
+            //child.swapAssignations(random.nextInt(father.getNreq()));
+            //child.moveAssignation(random.nextInt(father.getNreq()));
+            //child.changeAssignation(i);
+            child.changeReqToMin(i);
+            //child.swapRandom(i);
 
             successors.add(new Successor("Change Assignation " + i + " " + hf.getHeuristicValue(child), child));
         }
