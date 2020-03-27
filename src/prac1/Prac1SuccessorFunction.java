@@ -12,11 +12,9 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
         Prac1State father = (Prac1State) o;
         ArrayList<Successor> successors = new ArrayList<>();
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
-
         for (int i = 0; i < father.getNreq(); ++i) {
             Set<Integer> serversWithFile = father.getFileLocations().get(i);
             Iterator <Integer> it = serversWithFile.iterator();
-
             for (int j = 0; j < serversWithFile.size(); ++j) {
                 Prac1State child = new Prac1State(father);
                 int oldServerID = father.getReqAssignations()[i];
@@ -26,24 +24,29 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
                         newServerID + " Heuristic: "+ hf.getHeuristicValue(child), child));
             }
 
+
+
+
             int fileOfReq = father.getFileID().get(i);
             for (int j = 0; j < father.getNreq(); ++j) {
-                if (fileOfReq == father.getFileID().get(j)) {
+                int otherFile = father.getFileID().get(j);
+                if (fileOfReq == otherFile && i != j) {
                     Prac1State child = new Prac1State(father);
                     try {
                         child.swapAssignation(i, j);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
+                    //System.out.println("Change Assignations " + i + " <--> " + j + " " +
+                    //        hf.getHeuristicValue(child));
                     successors.add(new Successor("Change Assignations " + i + " <--> " + j + " " +
                             hf.getHeuristicValue(child), child));
                 }
             }
 
+
+
         }
-
-
         return successors;
     }
 

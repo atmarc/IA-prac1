@@ -344,10 +344,10 @@ public class Prac1State {
         reqAssignations[i] = server2;
         reqAssignations[j] = server1;
 
-        addTime(server1, -this.servers.tranmissionTime(server1, FileID.get(i)));
-        addTime(server1, this.servers.tranmissionTime(server1, FileID.get(j)));
+        addTime(server1, -this.servers.tranmissionTime(server1, UserID.get(i)));
+        addTime(server1, this.servers.tranmissionTime(server1, UserID.get(j)));
 
-        addTime(server1, -this.servers.tranmissionTime(server2, FileID.get(j)));
-        addTime(server1, this.servers.tranmissionTime(server2, FileID.get(i)));
+        addTime(server2, -this.servers.tranmissionTime(server2, UserID.get(j)));
+        addTime(server2, this.servers.tranmissionTime(server2, UserID.get(i)));
     }
 }

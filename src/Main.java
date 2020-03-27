@@ -22,7 +22,7 @@ public class Main {
         int nrep = 5; // Number of repetitons of files
         int nUsers = 200;
         int requestsPerUser = 5;
-        int seed = 1234;
+        int seed = 69613;
 
         Servers servers = new Servers(nserv, nrep, seed);
         Requests requests = new Requests(nUsers, requestsPerUser, seed);
