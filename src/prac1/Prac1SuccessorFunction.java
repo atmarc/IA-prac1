@@ -4,9 +4,7 @@ import aima.search.framework.HeuristicFunction;
 import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Prac1SuccessorFunction implements SuccessorFunction {
 
@@ -16,16 +14,35 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
 
         for (int i = 0; i < father.getNreq(); ++i) {
-            Prac1State child = new Prac1State(father);
+            Set<Integer> serversWithFile = father.getFileLocations().get(i);
+            Iterator <Integer> it = serversWithFile.iterator();
 
-            //child.swapAssignations(random.nextInt(father.getNreq()));
-            //child.moveAssignation(random.nextInt(father.getNreq()));
-            //child.changeAssignation(i);
-            child.changeReqToMin(i);
-            //child.swapRandom(i);
+            for (int j = 0; j < serversWithFile.size(); ++j) {
+                Prac1State child = new Prac1State(father);
+                int oldServerID = father.getReqAssignations()[i];
+                int newServerID = it.next();
+                child.moveAssignation(i, newServerID);
+                successors.add(new Successor("Change assignation's server " + oldServerID + " to server " +
+                        newServerID + " Heuristic: "+ hf.getHeuristicValue(child), child));
+            }
 
-            successors.add(new Successor("Change Assignation " + i + " " + hf.getHeuristicValue(child), child));
+            int fileOfReq = father.getFileID().get(i);
+            for (int j = 0; j < father.getNreq(); ++j) {
+                if (fileOfReq == father.getFileID().get(j)) {
+                    Prac1State child = new Prac1State(father);
+                    try {
+                        child.swapAssignation(i, j);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    successors.add(new Successor("Change Assignations " + i + " <--> " + j + " " +
+                            hf.getHeuristicValue(child), child));
+                }
+            }
+
         }
+
 
         return successors;
     }

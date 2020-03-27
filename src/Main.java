@@ -29,7 +29,6 @@ public class Main {
 
         Prac1State initialState = new Prac1State(requests, servers, nserv, seed);
 
-
         Problem problem = new Problem(initialState, new Prac1SuccessorFunction(), new Prac1GoalTest(),
                 new Prac1HeuristicFunction());
 
