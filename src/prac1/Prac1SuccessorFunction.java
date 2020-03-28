@@ -24,9 +24,6 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
                         newServerID + " Heuristic: "+ hf.getHeuristicValue(child), child));
             }
 
-
-
-
             int fileOfReq = father.getFileID().get(i);
             for (int j = 0; j < father.getNreq(); ++j) {
                 int otherFile = father.getFileID().get(j);
@@ -43,8 +40,6 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
                             hf.getHeuristicValue(child), child));
                 }
             }
-
-
 
         }
         return successors;

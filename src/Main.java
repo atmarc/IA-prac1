@@ -10,10 +10,7 @@ import prac1.Prac1HeuristicFunction;
 import prac1.Prac1State;
 import prac1.Prac1SuccessorFunction;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class Main {
 
@@ -22,35 +19,63 @@ public class Main {
         int nrep = 5; // Number of repetitons of files
         int nUsers = 200;
         int requestsPerUser = 5;
-        int seed = 69613;
+        int seed = 123874;
 
-        Servers servers = new Servers(nserv, nrep, seed);
-        Requests requests = new Requests(nUsers, requestsPerUser, seed);
+        ArrayList<Integer> Ks = new ArrayList<>(List.of(1, 5, 10, 25, 50, 125));
+        ArrayList<Double> lmbds = new ArrayList<>(List.of(1D, 0.1D, 0.01D, 0.001D, 0.0001D, 0.00001D));
 
-        Prac1State initialState = new Prac1State(requests, servers, nserv, seed);
+        for (int j = 0; j < 6; j++) {
+            for (int i = 0; i < 6; i++) {
+                double sum = 0;
+                for (int x = 1; x <= 5; x++) {
+                    int current_seed = seed * x;
+                    Servers servers = new Servers(nserv, nrep, current_seed);
+                    Requests requests = new Requests(nUsers, requestsPerUser, current_seed);
+                    Prac1State initialState = new Prac1State(requests, servers, nserv, current_seed);
+                    Problem problem = new Problem(initialState, new Prac1SuccessorFunction(), new Prac1GoalTest(),
+                            new Prac1HeuristicFunction());
 
-        Problem problem = new Problem(initialState, new Prac1SuccessorFunction(), new Prac1GoalTest(),
-                new Prac1HeuristicFunction());
+                    sum += runSimulatedAnealing(problem, 2000, 100, Ks.get(i), lmbds.get(j));
+                }
+                System.out.println(sum/5 + " " + Ks.get(i) + " " + lmbds.get(j));
+            }
+        }
 
+    }
+
+    private static void runHillClimbing(Problem problem) throws Exception {
         Search search = new HillClimbingSearch();
-        //SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(2000, 100, 5, 0.001D);
-        System.out.println("Starting program!");
-
         double before = System.currentTimeMillis();
         SearchAgent searchAgent = new SearchAgent(problem, search);
         double after = System.currentTimeMillis();
 
-        printActions(searchAgent.getActions());
-        printInstrumentation(searchAgent.getInstrumentation());
+        //printActions(searchAgent.getActions());
+        //printInstrumentation(searchAgent.getInstrumentation());
 
         Prac1State goal = (Prac1State) search.getGoalState();
-
-        System.out.println("Execution time: " + (after - before) + " ms");
-
+        //System.out.println("Execution time: " + (after - before) + " ms");
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
-        System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
-        System.out.println("Max time: " + goal.getMaxTime() + " ms");
-        System.out.println("Total time: " + goal.getTotalTime() + " ms");
+        //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
+        //System.out.println("Max time: " + goal.getMaxTime() + " ms");
+        System.out.println(goal.getMaxTime());
+        //System.out.println("Total time: " + goal.getTotalTime() + " ms");
+    }
+
+    private static double runSimulatedAnealing(Problem problem, int steps, int siter, int k, double lamb) throws Exception {
+        SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(steps, siter, k, lamb);
+        double before = System.currentTimeMillis();
+        SearchAgent searchAgent = new SearchAgent(problem, search);
+        double after = System.currentTimeMillis();
+        //printActions(searchAgent.getActions());
+        //printInstrumentation(searchAgent.getInstrumentation());
+        Prac1State goal = (Prac1State) search.getGoalState();
+        //System.out.println("Execution time: " + (after - before) + " ms");
+        Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
+        //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
+        //System.out.println("Max time: " + goal.getMaxTime() + " ms");
+        //System.out.println(goal.getMaxTime() + " " + steps + " " + siter + " " + k + " " + lamb);
+        //System.out.println("Total time: " + goal.getTotalTime() + " ms");
+        return goal.getMaxTime();
     }
 
     private static void printActions(List actions) {

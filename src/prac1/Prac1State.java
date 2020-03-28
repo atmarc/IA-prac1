@@ -50,14 +50,12 @@ public class Prac1State {
             FileID.add(file);
 
 
-
             /*
             int current_server = FileLocations.get(file).iterator().next();
             reqAssignations[i] = current_server;
             int time = servers.tranmissionTime(current_server, user);
             addTime(current_server, time);
             */
-
             assignReqToMinTransmissionTime(i);
 
         }
@@ -65,7 +63,7 @@ public class Prac1State {
 
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
 
-        System.out.println("First node heuristic: " + hf.getHeuristicValue(this));
+        //System.out.println("First node heuristic: " + hf.getHeuristicValue(this));
     }
 
     // Constructora de copia
@@ -140,6 +138,7 @@ public class Prac1State {
     }
 
     public int getMaxTransmissionTimeServer() {
+        this.calcMaxTransmissionTimeServer();
         return maxTransmissionTimeServer;
     }
 
