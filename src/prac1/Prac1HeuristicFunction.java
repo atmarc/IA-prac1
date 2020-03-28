@@ -61,6 +61,6 @@ public class Prac1HeuristicFunction implements HeuristicFunction {
 
         //double heuristicaSuprema = (h1 + h2 + h3) / 3;
 
-        return h1;
+        return maxValue;
     }
 }

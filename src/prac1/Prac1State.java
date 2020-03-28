@@ -3,6 +3,7 @@ package prac1;
 import IA.DistFS.Requests;
 import IA.DistFS.Servers;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -16,7 +17,7 @@ public class Prac1State {
     private ArrayList<Integer> FileID;
 
     // Servers
-    private ArrayList<Set<Integer>> FileLocations;
+    private HashMap<Integer, Set<Integer>> FileLocations;
 
     // Assignation
     private int [] reqAssignations; // la posició i conté el serverID que respon a la request i
@@ -29,17 +30,12 @@ public class Prac1State {
     public Prac1State(Requests req, Servers serv, int nserv, int seed) {
         this.UserID = new ArrayList<>();
         this.FileID = new ArrayList<>();
-        this.FileLocations = new ArrayList<>();
+        this.FileLocations = new HashMap<Integer, Set<Integer>>();
         this.reqAssignations = new int [req.size()];
         this.serverTransmissionTimes = new HashMap<>();
         this.nserv = nserv;
         this.requests = req;
         this.servers = serv;
-
-        for (int i = 0; i < serv.size(); ++i) {
-            Set<Integer> aux = serv.fileLocations(i);
-            FileLocations.add(aux);
-        }
 
         for (int i = 0; i < req.size(); ++i) {
             int [] aux = req.getRequest(i);
@@ -48,17 +44,23 @@ public class Prac1State {
 
             UserID.add(user);
             FileID.add(file);
-
-
-            /*
-            int current_server = FileLocations.get(file).iterator().next();
-            reqAssignations[i] = current_server;
-            int time = servers.tranmissionTime(current_server, user);
-            addTime(current_server, time);
-            */
-            assignReqToMinTransmissionTime(i);
-
         }
+
+        for (int i = 0; i < req.size(); ++i) {
+            Set<Integer> aux = serv.fileLocations(FileID.get(i));
+            FileLocations.put(FileID.get(i), aux);
+        }
+
+        for (int i = 0; i < req.size(); ++i) {
+            assignReqToMinTransmissionTime(i);
+            /*
+            int current_server = FileLocations.get(FileID.get(i)).iterator().next();
+            reqAssignations[i] = current_server;
+            int time = servers.tranmissionTime(current_server, UserID.get(i));
+            addTime(current_server, time);
+             */
+        }
+
         calcMaxTransmissionTimeServer();
 
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
@@ -86,7 +88,7 @@ public class Prac1State {
         return FileID;
     }
 
-    public ArrayList<Set<Integer>> getFileLocations() {
+    public HashMap<Integer, Set<Integer>> getFileLocations() {
         return FileLocations;
     }
 

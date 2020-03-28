@@ -1,6 +1,5 @@
 package prac1;
 
-import aima.search.framework.HeuristicFunction;
 import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 
@@ -13,16 +12,20 @@ public class Prac1SuccessorFunction implements SuccessorFunction {
         ArrayList<Successor> successors = new ArrayList<>();
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
         for (int i = 0; i < father.getNreq(); ++i) {
-            Set<Integer> serversWithFile = father.getFileLocations().get(i);
+
+            int file = father.getFileID().get(i);
+            Set<Integer> serversWithFile = father.getFileLocations().get(file);
             Iterator <Integer> it = serversWithFile.iterator();
+
             for (int j = 0; j < serversWithFile.size(); ++j) {
                 Prac1State child = new Prac1State(father);
                 int oldServerID = father.getReqAssignations()[i];
                 int newServerID = it.next();
                 child.moveAssignation(i, newServerID);
-                successors.add(new Successor("Change assignation's server " + oldServerID + " to server " +
+                successors.add(new Successor("Change server " + oldServerID + " assignation's to server " +
                         newServerID + " Heuristic: "+ hf.getHeuristicValue(child), child));
             }
+
 
             int fileOfReq = father.getFileID().get(i);
             for (int j = 0; j < father.getNreq(); ++j) {

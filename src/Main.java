@@ -19,15 +19,18 @@ public class Main {
         int nrep = 5; // Number of repetitons of files
         int nUsers = 200;
         int requestsPerUser = 5;
-        int seed = 123874;
+        int seed = 234478;
 
-        ArrayList<Integer> Ks = new ArrayList<>(List.of(1, 5, 10, 25, 50, 125));
-        ArrayList<Double> lmbds = new ArrayList<>(List.of(1D, 0.1D, 0.01D, 0.001D, 0.0001D, 0.00001D));
+        ArrayList<Integer> Ks = new ArrayList<>(List.of(1, 5, 25, 50, 125, 250, 500));
+        ArrayList<Double> lmbds = new ArrayList<>(List.of(100D, 10D, 1D, 0.1D, 0.01D, 0.001D, 0.0001D));
 
-        for (int j = 0; j < 6; j++) {
-            for (int i = 0; i < 6; i++) {
+        int nIter = 1;
+        int nRep = 1;
+
+        for (int j = 0; j < nIter; j++) {
+            for (int i = 0; i < nIter; i++) {
                 double sum = 0;
-                for (int x = 1; x <= 5; x++) {
+                for (int x = 1; x <= nRep; x++) {
                     int current_seed = seed * x;
                     Servers servers = new Servers(nserv, nrep, current_seed);
                     Requests requests = new Requests(nUsers, requestsPerUser, current_seed);
@@ -35,9 +38,11 @@ public class Main {
                     Problem problem = new Problem(initialState, new Prac1SuccessorFunction(), new Prac1GoalTest(),
                             new Prac1HeuristicFunction());
 
-                    sum += runSimulatedAnealing(problem, 2000, 100, Ks.get(i), lmbds.get(j));
+                    //sum += runSimulatedAnealing(problem, 8000, 2000, Ks.get(i), lmbds.get(j));
+                    sum += runSimulatedAnealing(problem, 2000, 500, 125, 0.001D);
+                    //runHillClimbing(problem);
                 }
-                System.out.println(sum/5 + " " + Ks.get(i) + " " + lmbds.get(j));
+                //System.out.println(sum/nIter + " " + Ks.get(i) + " " + lmbds.get(j));
             }
         }
 
@@ -49,7 +54,7 @@ public class Main {
         SearchAgent searchAgent = new SearchAgent(problem, search);
         double after = System.currentTimeMillis();
 
-        //printActions(searchAgent.getActions());
+        printActions(searchAgent.getActions());
         //printInstrumentation(searchAgent.getInstrumentation());
 
         Prac1State goal = (Prac1State) search.getGoalState();
@@ -58,6 +63,7 @@ public class Main {
         //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
         //System.out.println("Max time: " + goal.getMaxTime() + " ms");
         System.out.println(goal.getMaxTime());
+        //System.out.println(after - before);
         //System.out.println("Total time: " + goal.getTotalTime() + " ms");
     }
 
@@ -73,7 +79,7 @@ public class Main {
         Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
         //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
         //System.out.println("Max time: " + goal.getMaxTime() + " ms");
-        //System.out.println(goal.getMaxTime() + " " + steps + " " + siter + " " + k + " " + lamb);
+        System.out.println(goal.getMaxTime() + " " + steps + " " + siter + " " + k + " " + lamb);
         //System.out.println("Total time: " + goal.getTotalTime() + " ms");
         return goal.getMaxTime();
     }
