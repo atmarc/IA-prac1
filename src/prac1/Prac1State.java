@@ -2,10 +2,7 @@ package prac1;
 
 import IA.DistFS.Requests;
 import IA.DistFS.Servers;
-
-import java.io.File;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public class Prac1State {
 
