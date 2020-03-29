@@ -22,8 +22,10 @@ public class Main {
         ArrayList<Double> lmbds = new ArrayList<>(List.of(0.001D, 0.0005D, 0.0001D, 0.00005D, 0.00001D));
 
         int nRep = 5;
-        for (int j = 0; j < lmbds.size(); j++) {
-            for (int i = 1; i < 25; i += 2) {
+        int nIter = 1;
+
+        for (int j = 0; j < nIter; j++) {
+            for (int i = 0; i < nIter; i++) {
                 double sum = 0;
                 for (int x = 1; x <= nRep; x++) {
                     int current_seed = seed * x;
@@ -40,16 +42,17 @@ public class Main {
                 System.out.println(sum/nRep + " " + i + " " + lmbds.get(j));
             }
         }
+
     }
 
-    private static void runHillClimbing(Problem problem) throws Exception {
+    private static double runHillClimbing(Problem problem) throws Exception {
         Search search = new HillClimbingSearch();
         double before = System.currentTimeMillis();
         SearchAgent searchAgent = new SearchAgent(problem, search);
         double after = System.currentTimeMillis();
 
-        printActions(searchAgent.getActions());
-        printInstrumentation(searchAgent.getInstrumentation());
+        //printActions(searchAgent.getActions());
+        //printInstrumentation(searchAgent.getInstrumentation());
 
         Prac1State goal = (Prac1State) search.getGoalState();
         //System.out.println("Execution time: " + (after - before) + " ms");
@@ -58,7 +61,9 @@ public class Main {
         //System.out.println("Max time: " + goal.getMaxTime() + " ms");
         //System.out.println(goal.getMaxTime());
         System.out.println(after - before);
+        //System.out.println(after - before);
         //System.out.println("Total time: " + goal.getTotalTime() + " ms");
+        return after - before;
     }
 
     private static double runSimulatedAnealing(Problem problem, int steps, int siter, int k, double lamb) throws Exception {

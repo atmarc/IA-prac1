@@ -20,6 +20,9 @@ public class Prac1State {
     private int [] reqAssignations; // la posició i conté el serverID que respon a la request i
     private int maxTransmissionTimeServer;
     private int nserv;
+
+
+
     private HashMap<Integer, Integer>  serverTransmissionTimes;
 
 
@@ -348,4 +351,9 @@ public class Prac1State {
         addTime(server2, -this.servers.tranmissionTime(server2, UserID.get(j)));
         addTime(server2, this.servers.tranmissionTime(server2, UserID.get(i)));
     }
+
+    public HashMap<Integer, Integer> getServerTransmissionTimes() {
+        return serverTransmissionTimes;
+    }
+
 }
