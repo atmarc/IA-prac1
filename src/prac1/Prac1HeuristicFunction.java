@@ -7,53 +7,58 @@ import java.util.HashMap;
 import java.util.MissingFormatArgumentException;
 
 public class Prac1HeuristicFunction implements HeuristicFunction {
+    final int MIN_TRANSMISSION_TIME = 100;
+    final int MAX_TRANSMISSION_TIME = 5000;
+    final int TIME_LAPSE = MAX_TRANSMISSION_TIME - MIN_TRANSMISSION_TIME;
 
     public double getHeuristicValue(Object o) {
 
         // Fer 3 heuristiques i combinar-les:
         //  - Temps màxim de transmissió
         //  - Variància total dels temps de transmissió
-        //  - Suma total dels temps dev transmissió
+        //  - Suma total dels temps de transmissió
 
         Prac1State current = (Prac1State) o;
 
+        double h1 = getH1(current);
+        double h2 = getH2(current);
+        double h3 = getH3(current);
 
-        int [] assignations = current.getReqAssignations();
-        ArrayList<Integer> users = current.getUserID();
-        int nReqs = current.getNreq();
+        double heuristicaSuprema = (h1 + h2 + h3);
+        //System.out.println(h1 + " " + h2 + " " + h3);
+        return heuristicaSuprema;
+    }
 
-        double tempsTotal = current.getTotalTime();
+    public double getH1(Prac1State obj) {
+        return obj.getMaxTime();
+    }
 
-        double mitjana = tempsTotal / current.getNserv();
+    public double getH2(Prac1State obj) {
+
+        double tempsTotal = obj.getTotalTime();
+
+        double mitjana = tempsTotal / obj.getNserv();
         double sumaDesviacions = 0;
 
-        HashMap<Integer, Integer> selects = current.getServerTransmissionTimes();
+        HashMap<Integer, Integer> selects = obj.getServerTransmissionTimes();
 
-        //int maxValue = 0;
         for(HashMap.Entry<Integer, Integer> entry : selects.entrySet()) {
             double desviacio = (mitjana - entry.getValue()) * (mitjana - entry.getValue());
             sumaDesviacions += desviacio;
         }
 
-        double variancia = sumaDesviacions / current.getNserv();
+        double variancia = sumaDesviacions / obj.getNserv();
         double desviacioTipica = Math.sqrt(variancia);
         double coeficientVariacio = desviacioTipica / mitjana;
+        //return coeficientVariacio;
+        return variancia/6;
+    }
 
-        final int MIN_TRANSMISSION_TIME = 100;
-        final int MAX_TRANSMISSION_TIME = 5000;
-        final int TIME_LAPSE = MAX_TRANSMISSION_TIME - MIN_TRANSMISSION_TIME;
-        final double maxH = 10;
-
-        double maxValue = current.getMaxTime();
-
-        double h1 = (maxValue / (MAX_TRANSMISSION_TIME * current.getNserv())) * maxH;
-
-        //double h1 = (maxTime - MIN_TRANSMISSION_TIME)/(TIME_LAPSE) * maxH;
-        double h2 = (coeficientVariacio * maxH);
-        double h3 = (tempsTotal - MIN_TRANSMISSION_TIME * nReqs)/(TIME_LAPSE * nReqs) * maxH;
-
-        double heuristicaSuprema = (h1 + h2 + h3) / 3;
-
-        return heuristicaSuprema;
+    public double getH3(Prac1State obj) {
+        int nReqs = obj.getNreq();
+        double tempsTotal = obj.getTotalTime();
+        double h3 = ((tempsTotal - MIN_TRANSMISSION_TIME * nReqs)/(TIME_LAPSE * nReqs));
+        //return h3;
+        return tempsTotal/obj.getNserv();
     }
 }

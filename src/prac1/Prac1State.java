@@ -10,18 +10,18 @@ public class Prac1State {
     private Servers servers;
 
     // Requests
-    private ArrayList<Integer> UserID;
-    private ArrayList<Integer> FileID;
+    final private ArrayList<Integer> UserID;
+    final private ArrayList<Integer> FileID;
 
     // Servers
-    private HashMap<Integer, Set<Integer>> FileLocations;
+    final private HashMap<Integer, Set<Integer>> FileLocations;
 
     // Assignation
     private int [] reqAssignations; // la posició i conté el serverID que respon a la request i
     private int maxTransmissionTimeServer;
     private int nserv;
 
-
+    private int firstMaxTime;
 
     private HashMap<Integer, Integer>  serverTransmissionTimes;
 
@@ -51,21 +51,15 @@ public class Prac1State {
             FileLocations.put(FileID.get(i), aux);
         }
 
+        // Initial solution
         for (int i = 0; i < req.size(); ++i) {
             assignReqToMinTransmissionTime(i);
-            /*
-            int current_server = FileLocations.get(FileID.get(i)).iterator().next();
-            reqAssignations[i] = current_server;
-            int time = servers.tranmissionTime(current_server, UserID.get(i));
-            addTime(current_server, time);
-             */
+            //assignReqToFirstServer(i);
         }
 
         calcMaxTransmissionTimeServer();
+        this.firstMaxTime = getMaxTime();
 
-        Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
-
-        //System.out.println("First node heuristic: " + hf.getHeuristicValue(this));
     }
 
     // Constructora de copia
@@ -78,6 +72,7 @@ public class Prac1State {
         this.serverTransmissionTimes = estatAnterior.copyTransmissionTimes();
         this.maxTransmissionTimeServer = estatAnterior.getMaxTransmissionTimeServer();
         this.servers = estatAnterior.getServers();
+        this.firstMaxTime = estatAnterior.getFirstMaxTime();
     }
 
     public ArrayList<Integer> getUserID() {
@@ -154,6 +149,10 @@ public class Prac1State {
         return maxValue;
     }
 
+    public int getFirstMaxTime() {
+        return firstMaxTime;
+    }
+
     public double getTotalTime() {
         double totalTime = 0;
         for(Map.Entry<Integer, Integer> entry : serverTransmissionTimes.entrySet()) {
@@ -169,6 +168,14 @@ public class Prac1State {
         else {
             serverTransmissionTimes.put(serverID, time);
         }
+    }
+
+    // Initial state, to the first server
+    private void assignReqToFirstServer(int i) {
+        int current_server = FileLocations.get(FileID.get(i)).iterator().next();
+        reqAssignations[i] = current_server;
+        int time = servers.tranmissionTime(current_server, UserID.get(i));
+        addTime(current_server, time);
     }
 
     // Initial state, every request goes to the closest server
@@ -196,15 +203,15 @@ public class Prac1State {
         int previous_server = reqAssignations[i];
         int previousTime = this.servers.tranmissionTime(previous_server, UserID.get(i));
         addTime(previous_server, -previousTime);
-        Iterator<Integer> it = FileLocations.get(file).iterator();
         Set <Integer> serversWithTheFile = FileLocations.get(file);
+        Iterator<Integer> it = serversWithTheFile.iterator();
         Random rand = new Random();
 
         for (int x = 0; x < rand.nextInt(serversWithTheFile.size()); ++x)
             it.next();
 
-        reqAssignations[i] = it.next();
-        int newServer = reqAssignations[i];
+        int newServer = it.next();
+        reqAssignations[i] = newServer;
         int newTime = this.servers.tranmissionTime(newServer, UserID.get(i));
         addTime(newServer, newTime);
 
