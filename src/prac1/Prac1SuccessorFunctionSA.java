@@ -15,6 +15,8 @@ public class Prac1SuccessorFunctionSA implements SuccessorFunction {
         int operadorRandom = new Random().nextInt(10);
 
         if (operadorRandom > 5) {
+            // Operador moure
+            // ---------------------------------------------------------------------------------------------------
             int reqI = new Random().nextInt(father.getNreq());
             int file = father.getFileID().get(reqI);
             Set<Integer> serversWithFile = father.getFileLocations().get(file);
@@ -29,8 +31,11 @@ public class Prac1SuccessorFunctionSA implements SuccessorFunction {
             child.moveAssignation(reqI, newServerID);
             successors.add(new Successor("Change server " + oldServerID + " assignation's to server " +
                     newServerID + " Heuristic: "+ hf.getHeuristicValue(child), child));
+            // ---------------------------------------------------------------------------------------------------
         }
         else {
+            // Operador permutar
+            // ---------------------------------------------------------------------------------------------------
             int file1, file2, reqI, reqI2;
             int secure = 0;
             do {
@@ -55,6 +60,7 @@ public class Prac1SuccessorFunctionSA implements SuccessorFunction {
                 successors.add(new Successor("Change Assignations " + reqI + " <--> " + reqI2 + " " +
                         hf.getHeuristicValue(child2), child2));
             }
+            // ---------------------------------------------------------------------------------------------------
         }
         return successors;
     }

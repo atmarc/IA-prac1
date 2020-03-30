@@ -1,8 +1,6 @@
 import IA.DistFS.Requests;
 import IA.DistFS.Servers;
-import aima.search.framework.Problem;
-import aima.search.framework.Search;
-import aima.search.framework.SearchAgent;
+import aima.search.framework.*;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
 import prac1.*;
@@ -18,25 +16,21 @@ public class Main {
         int requestsPerUser = 5;
         int seed = 78411;
 
-        ArrayList<Integer> Ks = new ArrayList<>(List.of(3, 5));
-        ArrayList<Double> lmbds = new ArrayList<>(List.of(0.001D, 0.00005D));
+        int nRep = 20;
 
-        int nRep = 10;
-        int nIter = 1;
-
-        double sum = 0;
         for (int x = 1; x <= nRep; x++) {
             int current_seed = seed * x;
             Servers servers = new Servers(nserv, nrep, current_seed);
             Requests requests = new Requests(nUsers, requestsPerUser, current_seed);
-            Prac1State initialState = new Prac1State(requests, servers, nserv, current_seed);
-            Problem problem = new Problem(initialState, new Prac1SuccessorFunctionSA(), new Prac1GoalTest(),
-                    new Prac1HeuristicFunction());
+            Prac1State initialState = new Prac1State(requests, servers, nserv);
+            //SuccessorFunction successor = new Prac1SuccessorFunctionSA();
+            SuccessorFunction successor = new Prac1SuccessorFunctionHC();
 
-            runSimulatedAnealing(problem);
-            //runHillClimbing(problem);
+            Problem problem = new Problem(initialState, successor, new Prac1GoalTest(), new Prac1HeuristicFunction());
+
+            //runSimulatedAnealing(problem);
+            runHillClimbing(problem);
         }
-        //System.out.println(sum/nRep);
 
     }
 
@@ -47,19 +41,7 @@ public class Main {
         double after = System.currentTimeMillis();
 
         //printActions(searchAgent.getActions());
-        //printInstrumentation(searchAgent.getInstrumentation());
-
-        Prac1State goal = (Prac1State) search.getGoalState();
-        //System.out.println("Execution time: " + (after - before) + " ms");
-        Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
-        //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
-        //System.out.println("Max time: " + goal.getMaxTime() + " ms");
-        //System.out.println(goal.getMaxTime());
-        //System.out.println(after - before);
-        //System.out.println(after - before);
-        //System.out.println("Total time: " + goal.getTotalTime() + " ms");
-        System.out.println((int)goal.getTotalTime() + " "  + (int)goal.getMaxTime() + " " + (int) (after - before) + " Heuristiques: " +
-                hf.getH1(goal) + " " + hf.getH2(goal) + " " + hf.getH3(goal));
+        printInstrumentation(searchAgent.getInstrumentation());
         return after - before;
     }
 
@@ -68,17 +50,9 @@ public class Main {
         double before = System.currentTimeMillis();
         SearchAgent searchAgent = new SearchAgent(problem, search);
         double after = System.currentTimeMillis();
-        Prac1State goal = (Prac1State) search.getGoalState();
         //printActions(searchAgent.getActions());
-        //printInstrumentation(searchAgent.getInstrumentation());
-        //System.out.println("Execution time: " + (after - before) + " ms");
-        Prac1HeuristicFunction hf = new Prac1HeuristicFunction();
-        //System.out.println("Punctuation: " + hf.getHeuristicValue(goal));
-        //System.out.println("Max time: " + goal.getMaxTime() + " ms");
-        int maxTime = goal.getMaxTime();
-        System.out.println((int)goal.getTotalTime() + " "  + (int)goal.getMaxTime() + " " + (int) (after - before) + " Heuristiques: " +
-                hf.getH1(goal) + " " + hf.getH2(goal) + " " + hf.getH3(goal));
-        return maxTime;
+        printInstrumentation(searchAgent.getInstrumentation());
+        return after - before;
     }
 
     private static void printActions(List actions) {
