@@ -23,13 +23,13 @@ public class Main {
         Servers servers = new Servers(nserv, nrep, seed);
         Requests requests = new Requests(nUsers, requestsPerUser, seed);
         Prac1State initialState = new Prac1State(requests, servers, nserv);
-        //SuccessorFunction successor = new Prac1SuccessorFunctionSA();
-        SuccessorFunction successor = new Prac1SuccessorFunctionHC();
+        SuccessorFunction successor = new Prac1SuccessorFunctionSA();
+        //SuccessorFunction successor = new Prac1SuccessorFunctionHC();
 
         Problem problem = new Problem(initialState, successor, new Prac1GoalTest(), new Prac1HeuristicFunction());
 
-        //runSimulatedAnealing(problem);
-        runHillClimbing(problem);
+        runSimulatedAnealing(problem);
+        //runHillClimbing(problem);
     }
 
     private static double runHillClimbing(Problem problem) throws Exception {
@@ -41,8 +41,8 @@ public class Main {
         //printActions(searchAgent.getActions());
         //printInstrumentation(searchAgent.getInstrumentation());
         Prac1State goal = (Prac1State) search.getGoalState();
-        System.out.println("Temps màxim: " + goal.getMaxTime() + " Temps total: " + goal.getTotalTime() +
-                " Temps d'execució: " + (int)(after - before) + " ms");
+        System.out.println("Temps màxim: " + (int)goal.getMaxTime() + " ms - Temps total: " + (int)goal.getTotalTime() +
+                " ms - Temps d'execució: " + (int)(after - before) + " ms");
         return after - before;
     }
 
@@ -54,8 +54,8 @@ public class Main {
         //printActions(searchAgent.getActions());
         //printInstrumentation(searchAgent.getInstrumentation());
         Prac1State goal = (Prac1State) search.getGoalState();
-        System.out.println("Temps màxim: " + goal.getMaxTime() + " Temps total: " + goal.getTotalTime() +
-                " Temps d'execució: " + (int)(after - before) + " ms");
+        System.out.println("Temps màxim: " + (int)goal.getMaxTime() + " ms - Temps total: " + (int)goal.getTotalTime() +
+                " ms - Temps d'execució: " + (int)(after - before) + " ms");
 
         return after - before;
     }
