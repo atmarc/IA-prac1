@@ -10,28 +10,26 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        int nserv = 50; // Number of servers
-        int nrep = 5; // Number of repetitons of files
-        int nUsers = 200;
-        int requestsPerUser = 5;
-        int seed = 78411;
+        int nserv = 50;             // Number of servers
+        int nrep = 5;               // Number of repetitons of files
+        int nUsers = 200;           // Number of users
+        int requestsPerUser = 5;    // Number of requests per user
+        int seed = 78411;           // Random seed
 
-        int nRep = 20;
 
-        for (int x = 1; x <= nRep; x++) {
-            int current_seed = seed * x;
-            Servers servers = new Servers(nserv, nrep, current_seed);
-            Requests requests = new Requests(nUsers, requestsPerUser, current_seed);
-            Prac1State initialState = new Prac1State(requests, servers, nserv);
-            //SuccessorFunction successor = new Prac1SuccessorFunctionSA();
-            SuccessorFunction successor = new Prac1SuccessorFunctionHC();
 
-            Problem problem = new Problem(initialState, successor, new Prac1GoalTest(), new Prac1HeuristicFunction());
+        // Per executar l'algoritme Simulated Annealing, descomentar les linies 26 i 31 i comentar les linies 27 i 32.
 
-            //runSimulatedAnealing(problem);
-            runHillClimbing(problem);
-        }
+        Servers servers = new Servers(nserv, nrep, seed);
+        Requests requests = new Requests(nUsers, requestsPerUser, seed);
+        Prac1State initialState = new Prac1State(requests, servers, nserv);
+        //SuccessorFunction successor = new Prac1SuccessorFunctionSA();
+        SuccessorFunction successor = new Prac1SuccessorFunctionHC();
 
+        Problem problem = new Problem(initialState, successor, new Prac1GoalTest(), new Prac1HeuristicFunction());
+
+        //runSimulatedAnealing(problem);
+        runHillClimbing(problem);
     }
 
     private static double runHillClimbing(Problem problem) throws Exception {
@@ -41,7 +39,10 @@ public class Main {
         double after = System.currentTimeMillis();
 
         //printActions(searchAgent.getActions());
-        printInstrumentation(searchAgent.getInstrumentation());
+        //printInstrumentation(searchAgent.getInstrumentation());
+        Prac1State goal = (Prac1State) search.getGoalState();
+        System.out.println("Temps màxim: " + goal.getMaxTime() + " Temps total: " + goal.getTotalTime() +
+                " Temps d'execució: " + (int)(after - before) + " ms");
         return after - before;
     }
 
@@ -51,7 +52,11 @@ public class Main {
         SearchAgent searchAgent = new SearchAgent(problem, search);
         double after = System.currentTimeMillis();
         //printActions(searchAgent.getActions());
-        printInstrumentation(searchAgent.getInstrumentation());
+        //printInstrumentation(searchAgent.getInstrumentation());
+        Prac1State goal = (Prac1State) search.getGoalState();
+        System.out.println("Temps màxim: " + goal.getMaxTime() + " Temps total: " + goal.getTotalTime() +
+                " Temps d'execució: " + (int)(after - before) + " ms");
+
         return after - before;
     }
 
